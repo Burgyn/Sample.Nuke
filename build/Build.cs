@@ -16,33 +16,31 @@ class Build : NukeBuild
 {
     public static int Main () => Execute<Build>(x => x.A);
 
-    bool CanExecute = true;
-
     Target A => _ => _
         .Triggers(B)
         .Executes(() =>
         {
-            CanExecute = false;
+            foreach (var target in ExecutionPlan)
+            {
+                target.Status = ExecutionStatus.Skipped;
+            }
             Log.Logger.Information("Target A");
         });
 
     Target B => _ => _
         .Triggers(C, D)
-        .OnlyWhenDynamic(()=> CanExecute)
         .Executes(() =>
         {
             Log.Logger.Information("Target B");
         });
 
     Target C => _ => _
-        .OnlyWhenDynamic(()=> CanExecute)
         .Executes(() =>
         {
             Log.Logger.Information("Target C");
         });
     
     Target D => _ => _
-        .OnlyWhenDynamic(()=> CanExecute)
         .Executes(() =>
         {
             Log.Logger.Information("Target D");
